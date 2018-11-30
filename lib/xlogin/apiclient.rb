@@ -33,6 +33,10 @@ module Xlogin
         end
       end
 
+      def respond_to_missing?(name, include_private = false)
+        name =~ /^exec_(?\w+)$/
+      end
+
       private
       def http(method, uri, **args)
 	http = Net::HTTP.new(uri.host, uri.port)
