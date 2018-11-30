@@ -22,7 +22,7 @@ module Xlogin
         super unless name =~ /^exec_(?\w+)$/
 
         begin
-          req = args.shift
+          req = args.shift || Request.new
           uri = URI(@base_uri)
           uri.path = "/vendors/#{$1}/actions"
 
