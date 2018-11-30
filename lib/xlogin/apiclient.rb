@@ -43,25 +43,11 @@ module Xlogin
 
     end
 
-    class Request
-
-      def initialize
-        @captures = []
-      end
-
-      def xlogin(args = nil)
-        return @xlogin if args.nil?
-        @xlogin = args
-      end
-
-      def command(args = nil)
-        return @command if args.nil?
-        @command = args
-      end
+    class Request < OpenStruct
 
       def capture(**args)
-        @captures ||= []
-        @captures << args
+        self.captures ||= []
+        self.captures << args
       end
 
     end
