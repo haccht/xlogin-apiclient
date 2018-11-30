@@ -44,12 +44,10 @@ module Xlogin
     end
 
     class Request < OpenStruct
-
-      def capture(**args)
+      def initialize(*args)
+        super(*args)
         self.captures ||= []
-        self.captures << args
       end
-
     end
   end
 end
