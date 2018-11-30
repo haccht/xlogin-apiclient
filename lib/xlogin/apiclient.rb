@@ -19,7 +19,7 @@ module Xlogin
       end
 
       def method_missing(name, *args, &block)
-        super unless name =~ /^exec_(?\w+)$/
+        super unless name =~ /^exec_(\w+)$/
 
         begin
           req = args.shift || Request.new
@@ -31,6 +31,10 @@ module Xlogin
         rescue => e
           raise APIError.new(e.message)
         end
+      end
+
+      def respond_to_missing?(name, include_private = false)
+        name =~ /^exec_(\w+)$/
       end
 
       private
