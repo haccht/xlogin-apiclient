@@ -13,14 +13,24 @@ module Xlogin
 	@base_uri = URI(uri)
       end
 
-      def run(vendor, req = Request.new, &block)
-        uri = URI(@base_uri)
-        uri.path = "/vendors/#{vendor}/actions"
+      def exec(req = Request.new, &block)
+        vendor = self.class.name.slice(/\w+$/).downcase
+        method("exec_#{vendor}").call(req, &block)
+      end
 
-        block.call(req) if block
-        http(:post, uri, req.to_h)
-      rescue => e
-	raise APIError.new(e.message)
+      def method_missing(name, *args, &block)
+        super unless name =~ /^exec_(?\w+)$/
+
+        begin
+          req = args.shift
+          uri = URI(@base_uri)
+          uri.path = "/vendors/#{$1}/actions"
+
+          block.call(req) if block
+          http(:post, uri, req.to_h)
+        rescue => e
+          raise APIError.new(e.message)
+        end
       end
 
       private
