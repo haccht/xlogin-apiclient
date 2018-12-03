@@ -8,33 +8,26 @@ module Xlogin
     class APIError < StandardError; end
 
     class Client
-
-      def initialize(uri)
-	@base_uri = URI(uri)
+      def initialize(base_uri, type:, **args)
+        @uri  = base_uri
+        @type = type
+        @args = args
       end
 
-      def exec(req = Request.new, &block)
-        vendor = self.class.name.slice(/\w+$/).downcase
-        method("exec_#{vendor}").call(req, &block)
-      end
+      def cmd(req = Request.new, &block)
+        req = Request.new(command: req) if req.kind_of?(String)
+        req.xlogin = @args
+        req.command_echo   = false
+        req.command_prompt = false
 
-      def method_missing(name, *args, &block)
-        super unless name =~ /^exec_(\w+)$/
+        block.call(req) if block
 
-        begin
-          req = args.shift || Request.new
-          uri = URI(@base_uri)
-          uri.path = "/vendors/#{$1}/actions"
+        uri = @uri.dup
+        uri.path = "/vendors/#{@type}/actions"
 
-          block.call(req) if block
-          http(:post, uri, req.to_h)
-        rescue => e
-          raise APIError.new(e.message)
-        end
-      end
-
-      def respond_to_missing?(name, include_private = false)
-        name =~ /^exec_(\w+)$/
+        http(:post, uri, req.to_h)
+      rescue => e
+        raise APIError.new(e.message)
       end
 
       private
@@ -52,9 +45,19 @@ module Xlogin
 
 	resp = http.request(req)
 	body = resp.body
-	body.nil? ? {} : JSON.parse(body)
+
+        Response.new(body.nil? ? {} : JSON.parse(body))
+      end
+    end
+
+    class Factory
+      def initialize(uri)
+	@base_uri = URI(uri)
       end
 
+      def create(**args)
+        Device.new(@base_uri, args)
+      end
     end
 
     class Request < OpenStruct
@@ -62,6 +65,9 @@ module Xlogin
         super(*args)
         self.captures ||= []
       end
+    end
+
+    class Response < OpenStruct
     end
   end
 end
