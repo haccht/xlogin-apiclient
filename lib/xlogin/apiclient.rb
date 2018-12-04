@@ -21,9 +21,6 @@ module Xlogin
         end
 
         req.xlogin = @args
-        req.command_echo   = false
-        req.command_prompt = false
-
         block.call(req) if block
 
         uri = @uri.dup
