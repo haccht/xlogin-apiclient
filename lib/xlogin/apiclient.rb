@@ -15,7 +15,11 @@ module Xlogin
       end
 
       def cmd(req = Request.new, &block)
-        req = Request.new(command: req) if req.kind_of?(String)
+        if req.kind_of?(String)
+          req, _req = Request.new, req
+          req.command = _req
+        end
+
         req.xlogin = @args
         req.command_echo   = false
         req.command_prompt = false
@@ -56,14 +60,18 @@ module Xlogin
       end
 
       def create(**args)
-        Device.new(@base_uri, args)
+        Client.new(@base_uri, args)
       end
     end
 
     class Request < OpenStruct
-      def initialize(*args)
+      def initialize(**args)
         super(*args)
         self.captures ||= []
+      end
+
+      def to_h
+        super.delete_if { |k, v| k == :captures && v.empty? }
       end
     end
 
