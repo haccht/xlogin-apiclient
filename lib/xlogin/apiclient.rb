@@ -24,7 +24,7 @@ module Xlogin
         block.call(req) if block
 
         uri = @uri.dup
-        uri.path = "/vendors/#{@type}/actions"
+        uri.path += "/vendors/#{@type}/actions"
 
         http(:post, uri, req.to_h)
       rescue => e
