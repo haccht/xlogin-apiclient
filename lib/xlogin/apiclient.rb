@@ -33,19 +33,19 @@ module Xlogin
 
       private
       def http(method, uri, **args)
-	http = Net::HTTP.new(uri.host, uri.port)
+        http = Net::HTTP.new(uri.host, uri.port)
 
-	klass = Net::HTTP.const_get(method.to_s.capitalize)
-	req  = klass.new(uri.path)
-	req["Accept"] = "application/json"
+        klass = Net::HTTP.const_get(method.to_s.capitalize)
+        req = klass.new(uri.path)
+        req["Accept"] = "application/json"
 
-	unless args.empty?
-	  req["Content-Type"] = "application/json"
-	  req.body = JSON.dump(args)
-	end
+        unless args.empty?
+          req["Content-Type"] = "application/json"
+          req.body = JSON.dump(args)
+        end
 
-	resp = http.request(req)
-	body = resp.body
+        resp = http.request(req)
+        body = resp.body
 
         Response.new(body.nil? ? {} : JSON.parse(body))
       end
@@ -53,17 +53,17 @@ module Xlogin
 
     class Factory
       def initialize(uri)
-	@base_uri = URI(uri)
+        @base_uri = URI(uri)
       end
 
       def create(**args)
-        Client.new(@base_uri, args)
+        Client.new(@base_uri, **args)
       end
     end
 
     class Request < OpenStruct
       def initialize(**args)
-        super(*args)
+        super(**args)
         self.captures ||= []
       end
 
