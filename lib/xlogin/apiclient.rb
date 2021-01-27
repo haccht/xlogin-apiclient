@@ -11,6 +11,8 @@ module Xlogin
       attr_accessor :base_url
     end
 
+    attr_reader :type, :args
+
     def initialize(base_url: self.class.base_url, **args)
       raise Error.new('base_url not defined') unless base_url
 
