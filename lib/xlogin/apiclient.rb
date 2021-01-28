@@ -36,11 +36,13 @@ module Xlogin
       req["Accept"] = "application/json"
 
       http = Net::HTTP.new(uri.host, uri.port)
-      body = http.request(req).body
-      resp = body ? JSON.parse(body) : {}
-      return resp if resp['success']
+      resp = http.request(req)
+      raise Error.new(resp.message) unless resp.code =~ /^2[0-9]{2}$/
 
-      raise Error.new(resp['error'])
+      data = resp.body ? JSON.parse(resp.body) : {}
+      raise Error.new(resp['error']) unless resp['success']
+
+      return data
     end
   end
 end
