@@ -40,7 +40,7 @@ module Xlogin
       raise Error.new(resp.message) unless resp.code =~ /^2[0-9]{2}$/
 
       data = resp.body ? JSON.parse(resp.body) : {}
-      raise Error.new(resp['error']) unless resp['success']
+      raise Error.new(data['error']) unless data['success']
 
       return data
     end
